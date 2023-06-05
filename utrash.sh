@@ -2,32 +2,48 @@
 
 #this only works if the target files/directories are in the pwd
 
-if ! [ -d $HOME/.utrash ] # if loop for... if .utrash directory does not exits
+if ! [[ -d $HOME/.utrash ]] # if loop for... if .utrash directory does not exits
 then
     mkdir $HOME/.utrash # creates the directory!
 fi  
-if [ "$1" = "rm" ] # if loop for... first argument is rm
+
+if [[ "$1" = "rm" ]] && [[ $# -ge 2 ]] # if loop for... first argument is rm
 then
-    if [ "$2" = "-r" ] && [[ $# = 3 ]] # if loop for... argument is "rm -r dir"
+    if [[ "$2" = "-r" ]] && [[ $# -eq 3 ]] # if loop for... argument is "rm -r dir"
     then
-	cp -r "$3" $HOME/.utrash
-	rm -fr "$3"
-    elif [[ $# = 2 ]] # if loop for... argument is "rm file_name"
+	if ! [[ -d $PWD/$3 ]] # checking that directory exists
+	then
+	    printf "Error: directory not found; check that the directory is in the PWD\n" > /dev/stderr
+	else # copy directory into trash, remove from pwd
+	    cp -r "$3" $HOME/.utrash
+	    rm -fr "$3"
+	fi
+    elif [[ $# -eq 2 ]] # if loop for... argument is "rm file_name"
     then
-	cp "$2" $HOME/.utrash
-	rm "$2"
+	if ! [[ -f $PWD/$2 ]]
+	then
+	    printf "Error: file not found; check that file is in the PWD\n" > /dev/stderr
+	else
+	    cp "$2" $HOME/.utrash
+	    rm "$2"
+	fi
     fi
-elif [[ $# = 1 ]] && [ "$1" = "ls" ] # if loop for... argument is "ls"
+elif [[ $# = 1 ]] && [[ "$1" = "ls" ]] # if loop for... argument is "ls"
 then
     ls $HOME/.utrash
-elif [[ $# = 2 ]] && [ "$1" = "dive" ] # if loop for... argument is "dive [name]"
+elif [[ $# = 2 ]] && [[ "$1" = "dive" ]] # if loop for... argument is "dive [name]"
 then
     target="$(find "$HOME/.utrash" -name "$2")"
-    if [ -d $target ] # if loop for... trying to pull a directory
+    if [[ -d $target ]] # if loop for... trying to pull a directory
     then
 	cp -r "$target" $PWD
-    else # trying to pull file
+	# if i wanted to delete it from the trash, i would add: rm -r $target
+    elif [[ -f $target ]] # trying to pull a file
+    then
 	cp "$target" $PWD
+	# if i wanted to delete it from the trash, i would add: rm $target
+    else # if the target is not in the utrash directory
+	printf "Error: file/directory not found in utrash; try the './utrash ls' command to check trash contents\n" > /dev/stderr
     fi
 elif [[ $# = 1 ]] && [ "$1" = "dump" ] # if loop for... argument is "dump"
 then
