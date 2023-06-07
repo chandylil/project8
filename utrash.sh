@@ -20,7 +20,7 @@ then
 	fi
     elif [[ $# -eq 2 ]] # argument is "rm file_name"
     then
-	if ! [[ -f $PWD/$2 ]]
+	if ! [[ -f $PWD/$2 ]] #checking that file exists
 	then
 	    printf "Error: file not found; check that file is in the PWD\n" > /dev/stderr
 	else # copy file into trash, remove from pwd
@@ -45,10 +45,10 @@ then
     else # if the target is not in the utrash directory
 	printf "Error: file/directory not found in utrash; try the './utrash ls' command to check trash contents\n" > /dev/stderr
     fi
-elif [[ $# = 1 ]] && [ "$1" = "dump" ] # argument is "dump"
+elif [[ $# = 1 ]] && [[ "$1" = "dump" ]] # argument is "dump"
 then # remove everything in the .utrash directory
     rm -fr $HOME/.utrash/*
-elif [[ $# = 1 ]] && [ "$1" = "--help" ] # the --help info
+elif [[ $# = 1 ]] && [[ "$1" = "--help" ]] # the --help info
 then
     printf "Usage:\n  utrash rm [file name]  -  removes file, stores copy in trash\n  utrash rm -r [directory name]  -  removes subdirectory, stores copy in trash\n  utrash ls  -  lists files currently in trash\n  utrash dive [name]  -  copies file/directory from trash into PWD\n  utrash dump  -  empties trash (permanent!)\n* Files/directories must be in PWD to be moved to trash *\n"
     else # if the arguments do not match any expected arguments
